@@ -13,7 +13,7 @@ const useGpsToAddress = () => {
     if (latitude !== null && longitude !== null) {
       try {
         const { data } = await getAddressFromGeo(latitude, longitude);
-        return { address: data, error: null };
+        return { address: data[0], error: null };
       } catch (e) {
         if (axios.isAxiosError(e)) {
           return { address: null, error: e.message };

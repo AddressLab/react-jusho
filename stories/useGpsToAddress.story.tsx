@@ -9,7 +9,9 @@ const Demo = () => {
 
   const handleClick = async () => {
     const res = await getAddress();
-    setAllAddresss(res.allAddress);
+    if (res.error === null) {
+      setAllAddresss(res.address.allAddress);
+    }
   };
 
   return (
