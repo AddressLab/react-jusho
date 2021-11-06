@@ -1,5 +1,6 @@
 import { Address } from '@/types';
 
 type GetAddressFromPostCodeResponse = Address;
+type GetAddressFromGeoResponse = Address;
 
-export type { GetAddressFromPostCodeResponse };
+export type { GetAddressFromPostCodeResponse, GetAddressFromGeoResponse };

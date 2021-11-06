@@ -1,12 +1,19 @@
 import axios, { AxiosResponse } from 'axios';
-import { GetAddressFromPostCodeResponse } from './interface';
+import { GetAddressFromPostCodeResponse, GetAddressFromGeoResponse } from './interface';
 
-const BASE_URL = '';
+const BASE_URL = 'https://api.jusho2.jp/jusho1/v1/';
 
 const getAddressFromPostCode = async (
-  postCode
+  postCode: string
 ): Promise<AxiosResponse<GetAddressFromPostCodeResponse>> => {
-  return axios.get(`${BASE_URL}?postcode=${postCode}`);
+  return axios.get(`${BASE_URL}/postcode?postcode=${postCode}`);
 };
 
-export { getAddressFromPostCode, BASE_URL };
+const getAddressFromGeo = async (
+  latitude: number | null,
+  longitude: number | null
+): Promise<AxiosResponse<GetAddressFromGeoResponse>> => {
+  return axios.get(`${BASE_URL}/geocode?lat=${latitude}&lng=${longitude}`);
+};
+
+export { getAddressFromPostCode, getAddressFromGeo, BASE_URL };

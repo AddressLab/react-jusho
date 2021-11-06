@@ -1,58 +1,27 @@
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { reverseGeocodingAPI } from '@/api/geocoding';
+import { getAddressFromGeo } from '@/api/index';
 import { Address } from '@/types';
+import axios from 'axios';
 
 const useGpsToAddress = () => {
   const { latitude, longitude } = useGeolocation();
 
-  const getAddress = async (): Promise<Partial<Address>> => {
-    const formattedAddress: Partial<Address> = {
-      postcode: '',
-      pref: '',
-      city: '',
-      town: '',
-      allAddress: '',
-    };
+  const getAddress = async (): Promise<{
+    address: Partial<Address | null>;
+    error: string | null;
+  }> => {
     if (latitude !== null && longitude !== null) {
       try {
-        const res = await reverseGeocodingAPI(latitude, longitude);
-        const componentsCounts: number[] = res.results.map((r) => {
-          return r.address_components.filter((c) => !c.types.includes('route')).length;
-        });
-        const resultIndex = componentsCounts.indexOf(Math.max(...componentsCounts));
-        const result = res.results[resultIndex];
-        const address = result.address_components.reverse();
-
-        let municipalitiesText = '';
-        let banchiText = '';
-        address.forEach(({ long_name, types }) => {
-          if (types.includes('postal_code')) {
-            formattedAddress.postcode = long_name;
-          } else if (types.includes('administrative_area_level_1')) {
-            formattedAddress.pref = long_name;
-          } else if (types.includes('locality')) {
-            municipalitiesText += long_name;
-          } else if (types.includes('sublocality_level_2')) {
-            municipalitiesText += long_name;
-          } else if (types.includes('sublocality_level_3')) {
-            banchiText += long_name;
-          } else if (types.includes('sublocality_level_4')) {
-            banchiText += long_name;
-          }
-        });
-
-        if (municipalitiesText !== '') {
-          formattedAddress.city = municipalitiesText;
+        const { data } = await getAddressFromGeo(latitude, longitude);
+        return { address: data, error: null };
+      } catch (e) {
+        if (axios.isAxiosError(e) && e.response) {
+          return { address: null, error: e.message };
         }
-        if (banchiText !== '') {
-          formattedAddress.allAddress = `${formattedAddress.pref}${formattedAddress.city}${formattedAddress.town}${banchiText}`;
-        }
-      } catch (err) {
-        console.log({ err });
+        return { address: null, error: (e as any).toString() };
       }
     }
-
-    return formattedAddress;
+    return { address: null, error: 'Could not get the latitude or longitude' };
   };
 
   return {
