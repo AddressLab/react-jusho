@@ -8,7 +8,13 @@ import { usePostcode } from 'react-jusho';
 
 const Demo = () => {
   const [prefRef, townRef, cityRef] = [useRef(null), useRef(null), useRef(null)];
-  const { address, searchAddress } = usePostcode({ prefRef, cityRef, townRef });
+  const { address, error, searchAddress } = usePostcode({
+    refs: {
+      pref: prefRef,
+      city: cityRef,
+      town: townRef,
+    },
+  });
 
   return (
     <>
@@ -18,7 +24,8 @@ const Demo = () => {
         <input type="text" placeholder={'市区町村'} ref={cityRef} />
         <input type="text" placeholder={'町域名'} ref={townRef} />
       </div>
-      <label>{JSON.stringify(address, null, 2)}</label>
+      <p>{`error: ${error}`}</p>
+      <p>{`json: ${JSON.stringify(address, null, 2)}`}</p>
     </>
   );
 };
