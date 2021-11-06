@@ -4,20 +4,26 @@ import { Address } from '@/types';
 import { getAddressFromPostCode } from '@/api';
 import axios from 'axios';
 
+type AddressKeys =
+  | 'prefCode'
+  | 'cityCode'
+  | 'postcode'
+  | 'pref'
+  | 'city'
+  | 'town'
+  | 'allAddress'
+  | 'office';
+
 const usePostcode = ({
-  prefRef,
-  cityRef,
-  townRef,
+  refs,
 }: {
-  prefRef?: React.MutableRefObject<HTMLInputElement>;
-  cityRef?: React.MutableRefObject<HTMLInputElement>;
-  townRef?: React.MutableRefObject<HTMLInputElement>;
+  refs: { [key in AddressKeys]?: React.MutableRefObject<HTMLInputElement> };
 }): {
-  address: Partial<Address> | null;
+  address: Address | null;
   error: string | null;
   searchAddress: (postcode: string) => void;
 } => {
-  const [address, setAddress] = useState<Partial<Address> | null>(null);
+  const [address, setAddress] = useState<Address | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const searchAddress = async (postCode: string) => {
@@ -25,18 +31,14 @@ const usePostcode = ({
       if (postCode.match(/^\d{3}-?\d{4}$/)) {
         const { data } = await getAddressFromPostCode(postCode);
         setAddress(data);
-        if (prefRef) {
-          prefRef.current.value = data.pref;
-        }
-        if (cityRef) {
-          cityRef.current.value = data.city;
-        }
-        if (townRef) {
-          townRef.current.value = data.town;
-        }
+        Object.entries(refs).forEach(([key, value]) => {
+          if (value !== undefined && value.current.value !== undefined) {
+            value.current.value = data[key];
+          }
+        });
       }
     } catch (e) {
-      if (axios.isAxiosError(e) && e.response) {
+      if (axios.isAxiosError(e)) {
         setError(e.message);
       }
     }
@@ -45,5 +47,5 @@ const usePostcode = ({
   return { address, error, searchAddress };
 };
 
-export type { Address };
+export type { AddressKeys };
 export { usePostcode };
