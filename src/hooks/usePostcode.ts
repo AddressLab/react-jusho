@@ -30,12 +30,16 @@ const usePostcode = ({
     try {
       if (postCode.match(/^\d{3}-?\d{4}$/)) {
         const { data } = await getAddressFromPostCode(postCode);
-        setAddress(data);
-        Object.entries(refs).forEach(([key, value]) => {
-          if (value !== undefined && value.current.value !== undefined) {
-            value.current.value = data[key];
-          }
-        });
+        if (data.length > 0) {
+          setAddress(data[0]);
+          Object.entries(refs).forEach(([key, value]) => {
+            if (value !== undefined && value.current.value !== undefined) {
+              value.current.value = data[0][key];
+            }
+          });
+        } else {
+          setError('No entries.');
+        }
       }
     } catch (e) {
       if (axios.isAxiosError(e)) {
