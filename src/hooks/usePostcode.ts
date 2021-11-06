@@ -1,15 +1,17 @@
 import { useState } from 'react';
 
 import { Address } from '@/types';
+import { getAddressFromPostCode } from '@/api';
+import axios from 'axios';
 
 const usePostcode = ({
   prefRef,
   cityRef,
   townRef,
 }: {
-  prefRef?: { current: HTMLInputElement };
-  cityRef?: { current: HTMLInputElement };
-  townRef?: { current: HTMLInputElement };
+  prefRef?: React.MutableRefObject<HTMLInputElement>;
+  cityRef?: React.MutableRefObject<HTMLInputElement>;
+  townRef?: React.MutableRefObject<HTMLInputElement>;
 }): {
   address: Partial<Address> | null;
   error: string | null;
@@ -21,23 +23,22 @@ const usePostcode = ({
   const searchAddress = async (postCode: string) => {
     try {
       if (postCode.match(/^\d{3}-?\d{4}$/)) {
-        setAddress({
-          pref: '東京都',
-          city: '港区',
-          town: '芝公園４丁目',
-        });
+        const { data } = await getAddressFromPostCode(postCode);
+        setAddress(data);
         if (prefRef) {
-          prefRef.current.value = '東京都';
+          prefRef.current.value = data.pref;
         }
         if (cityRef) {
-          cityRef.current.value = '港区';
+          cityRef.current.value = data.city;
         }
         if (townRef) {
-          townRef.current.value = '芝公園４丁目';
+          townRef.current.value = data.town;
         }
       }
-    } catch (err: any) {
-      setError(err.toString());
+    } catch (e) {
+      if (axios.isAxiosError(e) && e.response) {
+        setError(e.message);
+      }
     }
   };
 
