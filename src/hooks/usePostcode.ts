@@ -29,7 +29,7 @@ const usePostcode = ({
   const searchAddress = async (postCode: string) => {
     try {
       if (postCode.match(/^\d{3}-?\d{4}$/)) {
-        const { data } = await getAddressFromPostCode(postCode);
+        const { data } = await getAddressFromPostCode(postCode.replace('-', ''));
         setAddress(data);
         Object.entries(refs).forEach(([key, value]) => {
           if (value !== undefined && value.current.value !== undefined) {
