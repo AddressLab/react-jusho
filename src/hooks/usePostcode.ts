@@ -32,6 +32,7 @@ const usePostcode = ({
         const { data } = await getAddressFromPostCode(postCode.replace('-', ''));
         if (data.length > 0) {
           setAddress(data[0]);
+          setError(null);
           Object.entries(refs).forEach(([key, value]) => {
             if (value !== undefined && value.current.value !== undefined) {
               value.current.value = data[0][key];
