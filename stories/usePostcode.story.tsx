@@ -6,11 +6,9 @@ import ShowDocs from './util/ShowDocs';
 const Demo = () => {
   const [prefRef, townRef, cityRef] = [useRef(null), useRef(null), useRef(null)];
   const { address, error, searchAddress } = usePostcode({
-    refs: {
-      pref: prefRef,
-      city: cityRef,
-      town: townRef,
-    },
+    pref: prefRef,
+    city: cityRef,
+    town: townRef,
   });
 
   return (

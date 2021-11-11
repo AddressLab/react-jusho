@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { GetAddressFromPostCodeResponse, GetAddressFromGeoResponse } from './interface';
 
-const BASE_URL = 'https://7c31-2400-2650-8123-e00-e086-14e4-c4df-8673.ngrok.io/jusho1/v1';
+const BASE_URL = 'http://api.jusho2.jp/jusho1/v1';
 
 const getAddressFromPostCode = async (
   postCode: string

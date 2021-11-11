@@ -6,19 +6,28 @@
 import { useGpsToAddress } from 'react-jusho';
 
 const Demo = () => {
-  const { getAddress } = useGpsToAddress();
-  const [allAddress, setAllAddresss] = React.useState < string > '';
+  const [prefRef, townRef, cityRef] = [useRef(null), useRef(null), useRef(null)];
+  const { address, error, getAddress } = useGpsToAddress({
+    pref: prefRef,
+    city: cityRef,
+    town: townRef,
+  });
 
   const handleClick = async () => {
-    const res = await getAddress();
-    setAllAddresss(res.allAddress);
+    await getAddress();
   };
 
   return (
-    <div>
-      <button onClick={handleClick}>GPSから住所を自動入力する</button>
-      <label>{JSON.stringify(allAddress, null, 2)}</label>
-    </div>
+    <>
+      <div style={{ display: 'flex', flexDirection: 'column', width: '200px' }}>
+        <button onClick={handleClick}>GPSから住所を自動入力する</button>
+        <input type="text" placeholder={'都道府県'} ref={prefRef} />
+        <input type="text" placeholder={'市区町村'} ref={cityRef} />
+        <input type="text" placeholder={'町域名'} ref={townRef} />
+      </div>
+      <p>{`error: ${error}`}</p>
+      <p>{`json: ${JSON.stringify(address, null, 2)}`}</p>
+    </>
   );
 };
 ```

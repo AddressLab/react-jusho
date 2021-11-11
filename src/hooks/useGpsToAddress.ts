@@ -1,30 +1,48 @@
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { getAddressFromGeo } from '@/api/index';
-import { Address } from '@/types';
+import { Address, AddressKeys } from '@/types';
 import axios from 'axios';
+import { useState } from 'react';
 
-const useGpsToAddress = () => {
+const useGpsToAddress = (
+  refs?: { [key in AddressKeys]?: React.MutableRefObject<HTMLInputElement> }
+) => {
   const { latitude, longitude } = useGeolocation();
+  const [address, setAddress] = useState<Address | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const getAddress = async (): Promise<{
-    address: Address | null;
-    error: string | null;
-  }> => {
+  const getAddress = async (): Promise<void> => {
     if (latitude !== null && longitude !== null) {
       try {
         const { data } = await getAddressFromGeo(latitude, longitude);
-        return { address: data[0], error: null };
-      } catch (e) {
-        if (axios.isAxiosError(e)) {
-          return { address: null, error: e.message };
+        if (data.length > 0) {
+          setAddress(data[0]);
+          setError(null);
+          if (refs) {
+            Object.entries(refs).forEach(([key, value]) => {
+              if (value !== undefined && value.current.value !== undefined) {
+                value.current.value = data[0][key];
+              }
+            });
+          }
+        } else {
+          setError('No entries.');
         }
-        return { address: null, error: (e as any).toString() };
+      } catch (e: any) {
+        if (axios.isAxiosError(e)) {
+          setError(e.message);
+        } else {
+          setError(e.toString());
+        }
       }
+    } else {
+      setError('Could not get the latitude or longitude.');
     }
-    return { address: null, error: 'Could not get the latitude or longitude' };
   };
 
   return {
+    address,
+    error,
     getAddress,
   };
 };

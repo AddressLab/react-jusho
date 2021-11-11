@@ -22,4 +22,14 @@ interface Address {
   officePostcode: boolean;
 }
 
-export type { Kana, Address };
+type AddressKeys =
+  | 'prefCode'
+  | 'cityCode'
+  | 'postcode'
+  | 'pref'
+  | 'city'
+  | 'town'
+  | 'allAddress'
+  | 'office';
+
+export type { Kana, Address, AddressKeys };
